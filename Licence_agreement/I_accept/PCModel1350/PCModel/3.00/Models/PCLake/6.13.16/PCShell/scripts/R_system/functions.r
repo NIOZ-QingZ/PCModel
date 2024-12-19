@@ -3,16 +3,25 @@
 #
 #  DESCRIPTION:
 #    This file contains general functions
-#
+# two modifications for NaaVRE by Stanley & Qing
+# Remove --arch x64 within lines 11-18
+# Shared object in Linux, Replace .dll with .so
 #==================================================================================================
 
 CompileModel <- function() { # compile model code (cpp) and produce dll
   setwd(paste(dir_SCHIL,"scripts/cpp2R/",sep=""))
   #system("compile_model_cpp.cmd",show.output.on.console = FALSE,invisible = FALSE)
-  file.remove("model.o")
-  file.remove("model.dll")
-  #system("R CMD SHLIB model.cpp") 
-  system("R --arch x64 CMD SHLIB model.cpp") 
+  # file.remove("model.dll")
+  if(.Platform$OS.type == "unix"){
+    file.remove("model.o")
+    file.remove("model.so")
+  } else if(.Platform$OS.type == "windows"){
+    file.remove("model.o")
+    file.remove("model.dll")
+  }
+  # system("R CMD SHLIB model.cpp") 
+  # system("R --arch x64 CMD SHLIB model.cpp") 
+  system("R CMD SHLIB model.cpp") 
 }
 
 InitializeModel <- function(number_of_states, vSTATES_LIST) {
@@ -22,7 +31,9 @@ InitializeModel <- function(number_of_states, vSTATES_LIST) {
 	if (grepl("rs",file_cpp))  tmp <- gsub("double &","",read.table(paste(Dir_source_adjusted,file_cpp,sep=""), header=F, stringsAsFactors = F, sep="=")$V1) #get names of state variables (in right order)
   }
   initStates=vSTATES_LIST
-  dyn.load("model.dll")
+
+  if(.Platform$OS.type == "unix") dyn.load("model.so") else if (.Platform$OS.type == "windows") dyn.load("model.dll")
+
   ini <- function(y, nr_of_states){
 	 .C("InitializeModel",  initState=y, state=double(nr_of_states))
   }
@@ -30,7 +41,8 @@ InitializeModel <- function(number_of_states, vSTATES_LIST) {
   # make vector with initial values of state variables
   states <- inits$state #get initial values of state variables
   names(states) <- gsub(" ","",tmp) # combine name and value
-  dyn.unload("model.dll")
+  if(.Platform$OS.type == "unix") dyn.unload("model.so") else if(.Platform$OS.type == "windows") dyn.unload("model.dll")
+  # dyn.unload("model.dll")
   return(assign("states", states, envir=.GlobalEnv))
 }
 
@@ -40,7 +52,8 @@ InitializeModel_MultiThread <- function(number_of_states) {
     if (grepl("sc",file_cpp))  ConvertFileToVector(paste(Dir_source_adjusted,file_cpp,sep=""),"initStates") # initial values of state variables 
     if (grepl("rs",file_cpp))  tmp <- gsub("double &","",read.table(paste(Dir_source_adjusted,file_cpp,sep=""), header=F, stringsAsFactors = F, sep="=")$V1) #get names of state variables (in right order)
   }
-  dyn.load("model.dll")
+  if(.Platform$OS.type == "unix") dyn.load("model.so") else if(.Platform$OS.type == "windows") dyn.load("model.dll")
+  # dyn.load("model.dll")
   ini <- function(y, nr_of_states){
 	 .C("InitializeModel",  initState=y, state=double(nr_of_states))
   }
@@ -48,12 +61,14 @@ InitializeModel_MultiThread <- function(number_of_states) {
   # make vector with initial values of state variables
   new_states <- inits$state #get initial values of state variables
   names(new_states) <- gsub(" ","",tmp) # combine name and value
-  dyn.unload("model.dll")
+  if(.Platform$OS.type == "unix") dyn.unload("model.so") else if(.Platform$OS.type == "windows") dyn.unload("model.dll")
+  # dyn.unload("model.dll")
   return(new_states)
 }
 
 RunModel <- function(states,times_output,parms,forcings,aux_number,aux_names,integrator,state_names,internal_time_step) {
-  dyn.load("model.dll")
+    if(.Platform$OS.type == "unix") dyn.load("model.so") else if(.Platform$OS.type == "windows") dyn.load("model.dll")
+    # dyn.load("model.dll")
   
   # solve differential equations 	
   if (integrator %in% c("rk2","rk23","rk23bs","rk34f","rk45f","rk45ck","rk45e","rk45dp6","rk45dp7","rk78dp","rk78f")) {
@@ -67,7 +82,8 @@ RunModel <- function(states,times_output,parms,forcings,aux_number,aux_names,int
   # store output (only for selected state variables and auxiliaries)
   outC <- outC[,c(1,which(colnames(outC) %in% c(state_names,aux_names)))]
 
-  dyn.unload("model.dll")
+  if(.Platform$OS.type == "unix") dyn.unload("model.so") else if(.Platform$OS.type == "windows") dyn.unload("model.dll")
+  # dyn.unload("model.dll")
   return(assign("outC", outC, envir=.GlobalEnv))
 }
 
