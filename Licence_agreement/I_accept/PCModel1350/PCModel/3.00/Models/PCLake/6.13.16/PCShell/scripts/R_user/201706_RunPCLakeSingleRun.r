@@ -10,9 +10,14 @@ rm(list=ls())
 # -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # user defined settings
 # -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-dir_SCHIL           =	"D:/Users/SvenT/Documents/PCLake/PCLake_3162/PCModel1350/PCModel/3.00/Models/PCLake/6.13.16/PCShell/"	# location of PCShell
-dir_DATM			=	"D:/Users/SvenT/Documents/PCLake/PCLake_3162/PCModel1350/PCModel/3.00/"					# location of DATM implementation (excel)
-file_DATM			=	"PL613162.xls"																			# file name of the DATM implementation
+# dir_SCHIL           =	"D:/Users/SvenT/Documents/PCLake/PCLake_3162/PCModel1350/PCModel/3.00/Models/PCLake/6.13.16/PCShell/"	# location of PCShell
+dir_SCHIL           =	"/home/jovyan/PCModel/Licence_agreement/I_accept/PCModel1350/PCModel/3.00/Models/PCLake/6.13.16/PCShell/"	# location of PCShell
+
+#dir_DATM			=	"D:/Users/SvenT/Documents/PCLake/PCLake_3162/PCModel1350/PCModel/3.00/"					# location of DATM implementation (excel)
+dir_DATM			=	"/home/jovyan/PCModel/Licence_agreement/I_accept/PCModel1350/PCModel/3.00/"					# location of DATM implementation (excel)
+
+#file_DATM			=	"PL613162.xls"																			# file name of the DATM implementation
+file_DATM			=	"/home/jovyan/PCModel/Licence_agreement/I_accept/PCModel1350/PCModel/3.00/Models/PCLake/6.13.16/PL613162.xls"																			# file name of the DATM implementation
 work_case           =	"R_base_work_case"                      												# name of work case
 modelname 			=	"_org"																					# name of the model (suffix to specific model files)
 
@@ -25,7 +30,7 @@ tGENERATE_INIT	=	FALSE
 # -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # initialisation of PCLake R Shell
 # -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-source(paste(dir_SCHIL,"scripts/R_system/functions.R",sep=""))  					 # Define functions
+source(paste(dir_SCHIL,"scripts/R_system/functions.r",sep=""))  					 # Define functions
 #here we load the cpp files containing the model code (the equations and initial settings) 
 #	these are loaded in the script as the user may wish to create multiple different models (different cpp's) and compare them
 #	In that case the user will have to compile multiple different DATM instances and save the cpp files to different folders,
@@ -37,7 +42,7 @@ cpp_files <- list.files(file.path(dir_DATM,paste("Frameworks/Osiris/3.01/PCLake/
 														"pl61316sa.cpp","pl61316sc.cpp","pl61316sd.cpp","pl61316si.cpp","pl61316sp.cpp","pl61316ss.cpp")))>0)==TRUE)]		
 file.copy(cpp_files, file.path(dir_SCHIL, work_case,"source_cpp"),overwrite=T)
 
-source(paste(dir_SCHIL,"scripts/R_system/201703_initialisationDATM.R",sep=""))    	 # Initialisation (read user defined input + convert cpp files of model + compile model)
+source(paste(dir_SCHIL,"scripts/R_system/201703_initialisationDATM.r",sep=""))    	 # Initialisation (read user defined input + convert cpp files of model + compile model)
 
 # -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Create extra sets of parameter and intial state settings
