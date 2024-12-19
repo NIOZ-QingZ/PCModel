@@ -22,10 +22,18 @@ PCModelCompileModel <- function(dirHOME) {
 
 	setwd(paste(dir_SCHIL,"scripts/cpp2R/",sep=""))
 	#system("compile_model_cpp.cmd",show.output.on.console = FALSE,invisible = FALSE)
-	file.remove(paste(dir_SCHIL,"scripts/cpp2R/","model.o",sep=""))
-	file.remove(paste(dir_SCHIL,"scripts/cpp2R/","model.dll",sep=""))
+    file.remove(paste(dir_SCHIL,"scripts/cpp2R/","model.o",sep=""))
+    if(.Platform$OS.type == "unix"){ 
+        file.remove(paste(dir_SCHIL,"scripts/cpp2R/","model.so",sep=""))
+    } else if (.Platform$OS.type == "windows") {
+       file.remove(paste(dir_SCHIL,"scripts/cpp2R/","model.dll",sep=""))
+    }
+    
+	# file.remove(paste(dir_SCHIL,"scripts/cpp2R/","model.dll",sep=""))
 	#system("R CMD SHLIB model.cpp") 
-	system(paste("R --arch x64 CMD SHLIB ", dir_SCHIL,"scripts/cpp2R/","model.cpp",sep="")) 
+	# system(paste("R --arch x64 CMD SHLIB ", dir_SCHIL,"scripts/cpp2R/","model.cpp",sep="")) 
+    # system(paste("R CMD SHLIB ", dir_SCHIL,"scripts/cpp2R/","model.cpp",sep=""))
+    system(paste("R CMD SHLIB ", dir_SCHIL,"scripts/cpp2R/","model.cpp",sep=""))
 	#system("R --arch x64 CMD SHLIB model.cpp") 
 }
 
@@ -61,7 +69,12 @@ PCModelInitializeModel <- function(dfSTATES, dfPARAMS, dirHOME) {
 			if (grepl("rs",file_cpp))  tmp <- gsub("double &","",read.table(paste(Dir_source_adjusted,file_cpp,sep=""), header=F, stringsAsFactors = F, sep="=")$V1) #get names of state variables (in right order)
 		}
 		initStates=vSTATES_LIST
-		dyn.load(paste(dir_SCHIL,"scripts/cpp2R/","model.dll",sep=""))
+        if(.Platform$OS.type == "unix"){
+            dyn.load(paste(dir_SCHIL,"scripts/cpp2R/","model.so",sep=""))
+        } else if (.Platform$OS.type == "windows"){
+            dyn.load(paste(dir_SCHIL,"scripts/cpp2R/","model.dll",sep=""))
+        }
+		# dyn.load(paste(dir_SCHIL,"scripts/cpp2R/","model.dll",sep=""))
 		ini <- function(y, nr_of_states){
 			.C("InitializeModel",  initState=y, state=double(nr_of_states))
 		}
@@ -70,7 +83,13 @@ PCModelInitializeModel <- function(dfSTATES, dfPARAMS, dirHOME) {
 		# make vector with initial values of state variables
 		states <- inits$state #get initial values of state variables
 		names(states) <- gsub(" ","",tmp) # combine name and value
-		dyn.unload(paste(dir_SCHIL,"scripts/cpp2R/","model.dll",sep=""))
+        
+        if(.Platform$OS.type == "unix"){
+            dyn.unload(paste(dir_SCHIL,"scripts/cpp2R/","model.so",sep=""))
+        } else if (.Platform$OS.type == "windows"){
+            dyn.unload(paste(dir_SCHIL,"scripts/cpp2R/","model.dll",sep=""))
+        }
+		# dyn.unload(paste(dir_SCHIL,"scripts/cpp2R/","model.dll",sep=""))
 	
 		dfSTATES_INIT_T0=cbind.data.frame(dfSTATES_INIT_T0,states)
 	}
