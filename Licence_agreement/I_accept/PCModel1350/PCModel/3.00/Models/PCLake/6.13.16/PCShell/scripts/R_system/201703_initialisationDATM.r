@@ -14,7 +14,9 @@ LoadPackage("XLConnect")
 
 # define path of working directory
 dir_SCEN        <- paste(dir_SCHIL,work_case,"/",sep="")
-path_DATM		=	paste(dir_DATM,file_DATM, sep='')
+#path_DATM		=	paste(dir_DATM,file_DATM, sep='')
+path_DATM		=	file_DATM
+cat(path_DATM, '\n')
 
 #check if we specifically indicated that we are doing a run to generate initrep, 
 #	if not set the variable to false for standard runs
@@ -327,6 +329,7 @@ if (length(aux_names)>0) {
    aux_units   <- "-"
 }
 model_cpp <- c(model_base_cpp[1:(id-1)],codelines,model_base_cpp[(id+1):length(model_base_cpp)])
+cat(model_cpp, "\n")
 
 # --------------------------------------------------------------
 # 2. define forcing functions 
