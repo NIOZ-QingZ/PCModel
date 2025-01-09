@@ -1,7 +1,7 @@
 # -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # start of PCLake R functions
 # -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-source(paste(dirHOME,"PCModel1350/PCModel/3.00/Models/PCLake/6.13.16/PCShell/scripts/R_system/functions2.R",sep=""))  	#load bas functions by Luuk van Gerven (2012-2016)
+source(paste(dirHOME,"PCModel1350/PCModel/3.00/Models/PCLake/6.13.16/PCShell/scripts/R_system/functions2.r",sep=""))  	#load bas functions by Luuk van Gerven (2012-2016)
 
 # load needed libraries
 LoadPackage("ggplot2")
